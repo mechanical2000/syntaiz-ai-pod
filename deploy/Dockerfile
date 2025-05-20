@@ -22,4 +22,4 @@ EXPOSE 80
 EXPOSE 443
 
 # Laisser l'utilisateur cloner le projet et lancer setup
-CMD ["/bin/bash"]
+CMD ["sleep", "infinity"]
