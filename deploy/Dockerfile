@@ -1,17 +1,24 @@
-FROM python:3.10-slim
+FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu20.04
 
-# Installer paquets système
+# Installer Python et les outils de base
 RUN apt update && apt install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
     nginx \
     curl \
     nano \
     git
 
-# Créer le répertoire de travail
+# Lier 'python' à 'python3' pour compatibilité
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# Définir le répertoire de travail (volume RunPod)
 WORKDIR /workspace
 
-# Exposer les ports (si besoin pour test direct)
+# Exposer uniquement les ports HTTP (FastAPI reste interne)
 EXPOSE 80
+EXPOSE 443
 
-# Laisser le lancement au script setup_system.sh
+# Laisser l'utilisateur cloner le projet et lancer setup
 CMD ["/bin/bash"]
