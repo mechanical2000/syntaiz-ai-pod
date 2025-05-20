@@ -42,13 +42,13 @@ server {
 }
 EOF
 
-echo "🔄 Nettoyage du PID Nginx et redémarrage propre"
+echo "🔄 Arrêt complet de Nginx existant et redémarrage propre"
 
-if [ -f /run/nginx.pid ]; then
-    echo "🔧 Suppression de /run/nginx.pid corrompu"
-    rm -f /run/nginx.pid
-fi
+# Stopper tous les nginx (s’il y en a), supprimer le pid corrompu
+pkill -f nginx 2>/dev/null || true
+rm -f /run/nginx.pid
 
+# Tester la config et relancer
 nginx -t && nginx
 
 # 🔚 Nettoyage temporaire
