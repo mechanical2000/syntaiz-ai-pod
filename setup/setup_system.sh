@@ -42,8 +42,13 @@ server {
 }
 EOF
 
-echo "🔄 Forçage du redémarrage de Nginx"
-pkill nginx 2>/dev/null || true
+echo "🔄 Nettoyage du PID Nginx et redémarrage propre"
+
+if [ -f /run/nginx.pid ]; then
+    echo "🔧 Suppression de /run/nginx.pid corrompu"
+    rm -f /run/nginx.pid
+fi
+
 nginx -t && nginx
 
 # 🔚 Nettoyage temporaire
