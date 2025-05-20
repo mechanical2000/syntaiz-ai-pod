@@ -23,8 +23,8 @@ NGINX_LINK="/etc/nginx/sites-enabled/syntaiz"
 # Créer ou écraser la config Nginx
 cat > $NGINX_CONF <<EOF
 server {
-    listen 5000 default_server;
-    listen [::]:5000 default_server;
+    listen 8888 default_server;
+    listen [::]:8888 default_server;
 
     server_name _;
 
