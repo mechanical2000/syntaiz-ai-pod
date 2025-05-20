@@ -23,13 +23,13 @@ NGINX_LINK="/etc/nginx/sites-enabled/syntaiz"
 # Créer ou écraser la config Nginx
 cat > $NGINX_CONF <<EOF
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+    listen 8080 default_server;
+    listen [::]:8080 default_server;
 
     server_name _;
 
     location / {
-        proxy_pass http://0.0.0.0:8000;
+        proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
     }
