@@ -47,8 +47,4 @@ IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
 echo "✅ Déploiement terminé ! Accès à l'API via :"
 echo "   👉 http://$IP_PUBLIQUE/generate"
-echo ""
-echo "📄 Dernières lignes du log FastAPI (app.log) :"
-echo ""
 
-tail -n 20 /workspace/app.log
