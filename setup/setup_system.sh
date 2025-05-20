@@ -34,18 +34,17 @@ server {
 }
 EOF
 
-# Activer le site
+# Activer le site si non lié
 [ -e "$NGINX_LINK" ] || ln -s $NGINX_CONF $NGINX_LINK
 
-echo "🔄 Redémarrage de Nginx"
-nginx -t && systemctl restart nginx
+echo "🔍 Vérification de la configuration Nginx"
+nginx -t
 
-# Optional: lancer Certbot automatiquement (décommenter si domaine déjà configuré)
-# echo "🔐 Configuration HTTPS via Certbot"
-# certbot --nginx -d ton-domaine.com --non-interactive --agree-tos -m ton.email@domain.com
+echo "🔄 Redémarrage de Nginx (compatible RunPod)"
+nginx -s reload || nginx
 
-echo "🚀 Lancement de l'app FastAPI"
+echo "🚀 Lancement de l'app FastAPI en arrière-plan"
 cd /workspace/syntaiz-ai-pod/app
 nohup uvicorn main:app --host 0.0.0.0 --port 8000 > /workspace/app.log 2>&1 &
 
-echo "✅ Pod prêt. Teste via : curl -X POST https://ton-domaine.com/generate"
+echo "✅ Déploiement terminé. Teste via : curl -X POST http://<IP_PUBLIQUE>/generate"
