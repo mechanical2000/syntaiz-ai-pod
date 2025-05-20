@@ -7,7 +7,8 @@ apt update && apt install -y \
     python3-pip \
     git \
     curl \
-    nano
+    nano \
+    nginx
 
 echo "📦 Installation des dépendances Python"
 pip install --upgrade pip
@@ -39,12 +40,17 @@ server {
 }
 EOF
 
-# Redémarrage de Nginx
-echo "🔄 Vérification et rechargement de Nginx"
-nginx -t && nginx -s reload || nginx
+echo "🔄 Redémarrage de Nginx propre"
+nginx -t && nginx -s stop || true
+nginx
 
 IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
-echo "✅ Déploiement terminé ! Accès à l'API via :"
-echo "   👉 http://$IP_PUBLIQUE/generate"
-
+echo "✅ Déploiement terminé !"
+echo ""
+echo "🌐 Tu peux tester ton API immédiatement avec :"
+echo ""
+echo "curl -X POST http://$IP_PUBLIQUE/generate \\"
+echo "     -H \"Content-Type: application/json\" \\"
+echo "     -d '{\"prompt\": \"Explique le mot synonyme\"}'"
+echo ""

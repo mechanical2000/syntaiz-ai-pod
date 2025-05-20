@@ -1,5 +1,6 @@
 FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
 # Installer Python et les outils de base
 RUN apt update && apt install -y \
     python3 \
