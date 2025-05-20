@@ -10,9 +10,14 @@ apt update && apt install -y \
     nano \
     nginx
 
+# 👉 Utiliser des répertoires temporaires sûrs dans /workspace
+export TMPDIR=/workspace/tmp
+export PIP_CACHE_DIR=/workspace/pip-cache
+mkdir -p $TMPDIR $PIP_CACHE_DIR
+
 echo "📦 Installation des dépendances Python"
-pip install --upgrade pip
-pip install -r /workspace/syntaiz-ai-pod/setup/requirements.txt
+pip install --no-cache-dir --cache-dir=$PIP_CACHE_DIR \
+    -r /workspace/syntaiz-ai-pod/setup/requirements.txt
 
 echo "🚀 Lancement de l'app FastAPI (Uvicorn) en arrière-plan"
 cd /workspace/syntaiz-ai-pod/app
@@ -20,11 +25,8 @@ nohup uvicorn main:app --host 0.0.0.0 --port 8000 > /workspace/app.log 2>&1 &
 
 echo "🛠️ Configuration de Nginx pour rediriger / vers FastAPI (localhost:8000)"
 NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
-
-# Sauvegarde de la conf actuelle
 cp "$NGINX_DEFAULT_CONF" "${NGINX_DEFAULT_CONF}.backup"
 
-# Écriture de la nouvelle config
 cat > "$NGINX_DEFAULT_CONF" <<EOF
 server {
     listen 80 default_server;
@@ -43,6 +45,10 @@ EOF
 echo "🔄 Redémarrage de Nginx propre"
 nginx -t && nginx -s stop || true
 nginx
+
+# 🔚 Nettoyage temporaire
+echo "🧹 Nettoyage des fichiers temporaires"
+rm -rf $TMPDIR $PIP_CACHE_DIR
 
 IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
