@@ -42,10 +42,9 @@ server {
 }
 EOF
 
-echo "🔄 Redémarrage propre de Nginx"
-nginx -t
-nginx -s stop 2>/dev/null || true
-nginx
+echo "🔄 Forçage du redémarrage de Nginx"
+pkill nginx 2>/dev/null || true
+nginx -t && nginx
 
 # 🔚 Nettoyage temporaire
 echo "🧹 Nettoyage des fichiers temporaires"
