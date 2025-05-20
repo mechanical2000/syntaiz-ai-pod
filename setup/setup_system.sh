@@ -47,4 +47,12 @@ echo "🚀 Lancement de l'app FastAPI en arrière-plan"
 cd /workspace/syntaiz-ai-pod/app
 nohup uvicorn main:app --host 0.0.0.0 --port 8000 > /workspace/app.log 2>&1 &
 
-echo "✅ Déploiement terminé. Teste via : curl -X POST http://<IP_PUBLIQUE>/generate"
+IP_PUBLIQUE=$(curl -s ifconfig.me)
+
+echo "✅ Déploiement terminé !"
+echo "🌐 Teste ton API avec :"
+echo ""
+echo "curl -X POST http://$IP_PUBLIQUE/generate \\"
+echo "     -H \"Content-Type: application/json\" \\"
+echo "     -d '{\"prompt\": \"Qu’est-ce qu’un synonyme ?\"}'"
+echo ""
