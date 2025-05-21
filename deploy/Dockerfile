@@ -1,23 +1,31 @@
 FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-# Installer Python et les outils de base
+
+# Installer Python 3.10 et les outils de base
 RUN apt update && apt install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    nginx \
+    software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt update && apt install -y \
+    python3.10 \
+    python3.10-venv \
+    python3.10-distutils \
     curl \
     nano \
-    git
+    git \
+    nginx \
+    wget \
+    ca-certificates
 
-# Lier 'python' à 'python3' pour compatibilité
-RUN ln -s /usr/bin/python3 /usr/bin/python
+# Mettre à jour les liens symboliques pour utiliser Python 3.10
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
+    ln -sf /usr/bin/python3.10 /usr/bin/python3 && \
+    wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && rm get-pip.py
 
 # Définir le répertoire de travail (volume RunPod)
 WORKDIR /workspace
 
-# Exposer uniquement les ports HTTP (FastAPI reste interne)
+# Exposer les ports nécessaires
 EXPOSE 80
 EXPOSE 443
 

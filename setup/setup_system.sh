@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export HUGGINGFACE_HUB_TOKEN=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
 set -e
 
 echo "🚀 Mise à jour du système"
