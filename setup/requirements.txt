@@ -1,6 +1,8 @@
 fastapi
 uvicorn
 transformers
-torch
 accelerate
 bitsandbytes
+sentencepiece
+safetensors
+huggingface_hub
