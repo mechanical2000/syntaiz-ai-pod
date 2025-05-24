@@ -7,3 +7,4 @@ sentencepiece
 safetensors
 huggingface_hub
 auto-gptq
+numpy
