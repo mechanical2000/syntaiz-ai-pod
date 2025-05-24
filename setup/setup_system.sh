@@ -3,7 +3,7 @@
 set -e
 
 # 🔐 Authentification Hugging Face pour modèles gated
-export HUGGINGFACE_HUB_TOKEN=hf_XXXXXXXXXXXXXXXXXXXXXXXX
+export HUGGINGFACE_HUB_TOKEN=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
 
 # 📁 Répertoire cache HF local pour éviter les erreurs de quota
 export HF_HUB_CACHE=/workspace/tmp/hf-cache
