@@ -2,6 +2,9 @@
 
 set -e
 
+# 🔐 Authentification Hugging Face pour modèles gated
+export HUGGINGFACE_HUB_TOKEN=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
+
 echo "🚀 Mise à jour du système"
 apt update && apt install -y \
     python3-pip \
@@ -27,7 +30,7 @@ MODEL_DIR=/workspace/models/mixtral
 if [ ! -d "$MODEL_DIR" ]; then
     echo "📥 Téléchargement du modèle Mixtral dans $MODEL_DIR..."
     mkdir -p $MODEL_DIR
-    python3 -c "import os; from huggingface_hub import snapshot_download; snapshot_download(repo_id='mistralai/Mixtral-8x7B-Instruct-v0.1', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token=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)"
+    python3 -c "import os; from huggingface_hub import snapshot_download; snapshot_download(repo_id='mistralai/Mixtral-8x7B-Instruct-v0.1', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token=os.getenv('HUGGINGFACE_HUB_TOKEN'))"
 else
     echo "✅ Modèle Mixtral déjà présent dans $MODEL_DIR"
 fi
