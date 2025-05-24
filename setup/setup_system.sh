@@ -33,8 +33,11 @@ pip install numpy==1.24.4 --no-cache-dir
 pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # Installer le reste depuis PyPI standard
-
-pip install git+https://github.com/PanQiWei/AutoGPTQ.git@v0.4.2 --no-cache-dir
+git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git /workspace/auto-gptq
+cd /workspace/auto-gptq
+export AUTO_GPTQ_NO_CUDA=1
+pip install . --no-cache-dir
+cd -
 
 # Installer le reste via PyTorch index (hors auto-gptq)
 pip install \
