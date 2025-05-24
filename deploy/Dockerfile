@@ -5,6 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Installer Python 3.10 et les outils de base
 RUN apt update && apt install -y \
     software-properties-common \
+    python3.10-dev \
     build-essential \
     cmake \
     ninja-build \
@@ -27,10 +28,6 @@ RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
 
 # Définir le répertoire de travail (volume RunPod)
 WORKDIR /workspace
-
-# Exposer les ports nécessaires
-EXPOSE 80
-EXPOSE 443
 
 # Laisser l'utilisateur cloner le projet et lancer setup
 CMD ["sleep", "infinity"]
