@@ -15,6 +15,9 @@ MODEL_DIR=/workspace/models/mixtral
 
 echo "🚀 Mise à jour du système"
 apt update && apt install -y \
+    build-essential \
+    cmake \
+    ninja-build \
     python3-pip \
     git \
     curl \
@@ -25,20 +28,18 @@ apt update && apt install -y \
 export TMPDIR=/workspace/tmp
 mkdir -p $TMPDIR
 
-# 🔄 Installation unique et complète des dépendances compatibles
+# 🔄 Installation des dépendances principales
 pip uninstall -y torch numpy auto-gptq triton || true
 pip install numpy==1.24.4 --no-cache-dir
-
-# Installer torch via index PyTorch CUDA
 pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
-# Installer le reste depuis PyPI standard
-git clone --branch no-cuda-fallback https://github.com/marella/AutoGPTQ.git /workspace/auto-gptq
+# ⚙️ Compilation CUDA : auto-gptq complet
+git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git /workspace/auto-gptq
 cd /workspace/auto-gptq
-AUTO_GPTQ_NO_CUDA=1 pip install . --no-cache-dir
+pip install . --no-cache-dir
 cd -
 
-# Installer le reste via PyTorch index (hors auto-gptq)
+# 📦 Autres dépendances via PyTorch index
 pip install \
     transformers==4.33.2 \
     fastapi \
@@ -87,6 +88,10 @@ nohup uvicorn main:app --host 0.0.0.0 --port 5001 > /workspace/app.log 2>&1 &
 # 🔚 Nettoyage temporaire
 echo "🧹 Nettoyage des fichiers temporaires"
 rm -rf $TMPDIR
+
+# 🧪 Validation GPU
+echo "🔍 Test GPU"
+python3 -c "import torch; print('CUDA:', torch.cuda.is_available(), '| Device:', torch.cuda.get_device_name(0))"
 
 IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
