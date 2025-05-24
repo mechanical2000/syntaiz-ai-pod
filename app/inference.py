@@ -1,21 +1,8 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
-from huggingface_hub import snapshot_download
 import torch
 import os
 
 MODEL_DIR = "/workspace/models/mixtral"
-
-# 📥 Télécharger le modèle si absent
-if not os.path.exists(os.path.join(MODEL_DIR, "config.json")):
-    print("📦 Téléchargement du modèle Mixtral via snapshot_download...")
-    snapshot_download(
-        repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
-        local_dir=MODEL_DIR,
-        local_dir_use_symlinks=False,
-        use_auth_token=True
-    )
-else:
-    print("✅ Modèle déjà présent dans", MODEL_DIR)
 
 # 🔄 Chargement du tokenizer
 print("🔄 Chargement du tokenizer Mixtral...")
