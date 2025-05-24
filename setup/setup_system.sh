@@ -31,7 +31,7 @@ mkdir -p $TMPDIR
 # 🔄 Installation des dépendances principales
 pip uninstall -y torch numpy auto-gptq triton || true
 pip install numpy==1.24.4 --no-cache-dir
-pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # ⚙️ Compilation CUDA : auto-gptq complet
 git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git /workspace/auto-gptq
