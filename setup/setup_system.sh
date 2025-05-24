@@ -1,6 +1,8 @@
 #!/bin/bash
-export HUGGINGFACE_HUB_TOKEN=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
+
 set -e
+
+export HUGGINGFACE_HUB_TOKEN=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
 
 echo "🚀 Mise à jour du système"
 apt update && apt install -y \
