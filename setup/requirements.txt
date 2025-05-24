@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-accelerate
-bitsandbytes
-sentencepiece
-safetensors
-huggingface_hub

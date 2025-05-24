@@ -23,22 +23,24 @@ apt update && apt install -y \
 
 # 👉 Utiliser des répertoires temporaires sûrs dans /workspace
 export TMPDIR=/workspace/tmp
-export PIP_CACHE_DIR=/workspace/pip-cache
-mkdir -p $TMPDIR $PIP_CACHE_DIR
+mkdir -p $TMPDIR
 
-# 🔄 Nettoyage des anciennes installations
-pip uninstall -y torch numpy auto-gptq || true
-
-# ✅ Installation manuelle des versions compatibles
-pip install numpy==1.24.4 --no-cache-dir
-pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118
-pip install auto-gptq==0.4.2
-pip install transformers==4.33.2
-pip uninstall -y triton || true
-
-# 📦 Installation des autres dépendances
-pip install --no-cache-dir --cache-dir=$PIP_CACHE_DIR \
-    -r /workspace/syntaiz-ai-pod/setup/requirements.txt
+# 🔄 Installation unique et complète des dépendances compatibles
+pip uninstall -y torch numpy auto-gptq triton || true
+pip install \
+    torch==2.0.1 \
+    numpy==1.24.4 \
+    auto-gptq==0.4.2 \
+    transformers==4.33.2 \
+    fastapi \
+    uvicorn \
+    accelerate \
+    bitsandbytes \
+    sentencepiece \
+    safetensors \
+    huggingface_hub \
+    --index-url https://download.pytorch.org/whl/cu118 \
+    --no-cache-dir
 
 # 📁 Téléchargement conditionnel du modèle Mixtral GPTQ
 if [ ! -d "$MODEL_DIR" ]; then
@@ -75,7 +77,7 @@ nohup uvicorn main:app --host 0.0.0.0 --port 5001 > /workspace/app.log 2>&1 &
 
 # 🔚 Nettoyage temporaire
 echo "🧹 Nettoyage des fichiers temporaires"
-rm -rf $TMPDIR $PIP_CACHE_DIR
+rm -rf $TMPDIR
 
 IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
