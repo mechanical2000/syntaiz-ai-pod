@@ -2,8 +2,7 @@
 
 set -e
 
-# 🔐 Authentification Hugging Face pour modèles gated
-export HUGGINGFACE_HUB_TOKEN=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
+
 
 # 📁 Répertoire cache HF local pour éviter les erreurs de quota
 export HF_HUB_CACHE=/workspace/tmp/hf-cache
@@ -33,7 +32,7 @@ pip install numpy==1.24.4 --no-cache-dir
 pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # Installer le reste depuis PyPI standard
-pip install "https://$HUGGINGFACE_HUB_TOKEN@huggingface.co/TheBloke/auto-gptq/resolve/main/auto_gptq-0.4.2+cu118-cp310-cp310-linux_x86_64.whl" --no-cache-dir
+pip install "https://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@huggingface.co/TheBloke/auto-gptq/resolve/main/auto_gptq-0.4.2+cu118-cp310-cp310-linux_x86_64.whl" --no-cache-dir
 
 # Installer le reste via PyTorch index (hors auto-gptq)
 pip install \
@@ -52,7 +51,7 @@ pip install \
 if [ ! -d "$MODEL_DIR" ]; then
     echo "📥 Téléchargement du modèle Mixtral quantifié depuis $MODEL_REPO dans $MODEL_DIR..."
     mkdir -p $MODEL_DIR
-    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token=$HUGGINGFACE_HUB_TOKEN)"
+    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token=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)"
 else
     echo "✅ Modèle Mixtral déjà présent dans $MODEL_DIR"
 fi
