@@ -35,8 +35,7 @@ pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no
 # Installer le reste depuis PyPI standard
 git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git /workspace/auto-gptq
 cd /workspace/auto-gptq
-export AUTO_GPTQ_NO_CUDA=1
-pip install . --no-cache-dir
+AUTO_GPTQ_NO_CUDA=1 pip install . --no-cache-dir
 cd -
 
 # Installer le reste via PyTorch index (hors auto-gptq)
