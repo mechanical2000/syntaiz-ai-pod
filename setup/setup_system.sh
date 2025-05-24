@@ -30,6 +30,8 @@ echo "📦 Installation de torch avec support CUDA 12.1"
 pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu121
 
 echo "📦 Installation des dépendances Python"
+pip uninstall -y numpy || true
+pip install numpy --no-cache-dir
 pip install --no-cache-dir --cache-dir=$PIP_CACHE_DIR \
     -r /workspace/syntaiz-ai-pod/setup/requirements.txt
 
