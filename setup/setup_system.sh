@@ -29,8 +29,11 @@ mkdir -p $TMPDIR
 pip uninstall -y torch numpy auto-gptq triton || true
 pip install numpy==1.24.4 --no-cache-dir
 
+# Installer torch via index PyTorch CUDA
+pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+
+# Installer le reste depuis PyPI standard
 pip install \
-    torch==2.0.1 \
     auto-gptq==0.4.2 \
     transformers==4.33.2 \
     fastapi \
