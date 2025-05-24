@@ -2,7 +2,8 @@
 
 set -e
 
-
+# 🔐 Authentification Hugging Face pour modèles gated
+export HUGGINGFACE_HUB_TOKEN=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
 
 # 📁 Répertoire cache HF local pour éviter les erreurs de quota
 export HF_HUB_CACHE=/workspace/tmp/hf-cache
@@ -32,7 +33,8 @@ pip install numpy==1.24.4 --no-cache-dir
 pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # Installer le reste depuis PyPI standard
-pip install "https://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@huggingface.co/TheBloke/auto-gptq/resolve/main/auto_gptq-0.4.2+cu118-cp310-cp310-linux_x86_64.whl" --no-cache-dir
+wget --header="Authorization: Bearer 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" "https://huggingface.co/TheBloke/auto-gptq/resolve/main/auto_gptq-0.4.2+cu118-cp310-cp310-linux_x86_64.whl" -O /tmp/auto_gptq.whl
+pip install /tmp/auto_gptq.whl --no-cache-dir
 
 # Installer le reste via PyTorch index (hors auto-gptq)
 pip install \
