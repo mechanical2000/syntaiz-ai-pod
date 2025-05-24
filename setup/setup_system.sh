@@ -26,20 +26,17 @@ export TMPDIR=/workspace/tmp
 export PIP_CACHE_DIR=/workspace/pip-cache
 mkdir -p $TMPDIR $PIP_CACHE_DIR
 
-echo "📦 Installation de torch avec support CUDA 12.1"
-pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu121
-
-echo "📦 Installation des dépendances Python"
+# 🔄 Nettoyage des anciennes installations
 pip uninstall -y torch numpy auto-gptq || true
 
-# Installer numpy en premier pour satisfaire les dépendances
+# ✅ Installation manuelle des versions compatibles
 pip install numpy==1.24.4 --no-cache-dir
-
 pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118
 pip install auto-gptq==0.4.2
 pip install transformers==4.33.2
 pip uninstall -y triton || true
 
+# 📦 Installation des autres dépendances
 pip install --no-cache-dir --cache-dir=$PIP_CACHE_DIR \
     -r /workspace/syntaiz-ai-pod/setup/requirements.txt
 
