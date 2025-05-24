@@ -1,8 +1,8 @@
-FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Installer Python 3.10 et outils de build
+# Installer Python 3.10 et les outils de base
 RUN apt update && apt install -y \
     software-properties-common \
     build-essential \
@@ -25,7 +25,12 @@ RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
     ln -sf /usr/bin/python3.10 /usr/bin/python3 && \
     wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && rm get-pip.py
 
-# Définir le répertoire de travail
+# Définir le répertoire de travail (volume RunPod)
 WORKDIR /workspace
 
+# Exposer les ports nécessaires
+EXPOSE 80
+EXPOSE 443
+
+# Laisser l'utilisateur cloner le projet et lancer setup
 CMD ["sleep", "infinity"]
