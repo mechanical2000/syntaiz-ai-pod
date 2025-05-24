@@ -2,6 +2,8 @@
 
 set -e
 
+export HUGGINGFACE_HUB_TOKEN=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
+
 # 📁 Répertoire cache HF local pour éviter les erreurs de quota
 export HF_HUB_CACHE=/workspace/tmp/hf-cache
 mkdir -p $HF_HUB_CACHE
