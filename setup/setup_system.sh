@@ -27,9 +27,10 @@ mkdir -p $TMPDIR
 
 # 🔄 Installation unique et complète des dépendances compatibles
 pip uninstall -y torch numpy auto-gptq triton || true
+pip install numpy==1.24.4 --no-cache-dir
+
 pip install \
     torch==2.0.1 \
-    numpy==1.24.4 \
     auto-gptq==0.4.2 \
     transformers==4.33.2 \
     fastapi \
