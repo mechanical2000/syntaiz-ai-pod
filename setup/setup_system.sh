@@ -29,7 +29,7 @@ mkdir -p $TMPDIR
 # 🔄 Installation des dépendances principales
 pip uninstall -y torch numpy auto-gptq triton || true
 pip install numpy==1.24.4 --no-cache-dir
-pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # ⚙️ Compilation CUDA : auto-gptq complet
 git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git /workspace/auto-gptq
@@ -47,17 +47,18 @@ pip install \
     huggingface_hub \
     --no-cache-dir
 
-# 📦 bitsandbytes compatible avec torch 2.1.0
-pip install bitsandbytes --prefer-binary --no-cache-dir
-
-# 📦 accelerate depuis index PyTorch
-pip install accelerate --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+# 📦 Paquets CUDA/PyTorch (depuis index cu118)
+pip install \
+    accelerate \
+    bitsandbytes \
+    --index-url https://download.pytorch.org/whl/cu118 \
+    --no-cache-dir
 
 # 📁 Téléchargement conditionnel du modèle Mixtral GPTQ
 if [ ! -d "$MODEL_DIR" ]; then
     echo "📥 Téléchargement du modèle Mixtral quantifié depuis $MODEL_REPO dans $MODEL_DIR..."
     mkdir -p $MODEL_DIR
-    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token=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)"
+    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token='$HUGGINGFACE_HUB_TOKEN')"
 else
     echo "✅ Modèle Mixtral déjà présent dans $MODEL_DIR"
 fi
