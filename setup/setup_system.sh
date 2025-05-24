@@ -11,6 +11,7 @@ mkdir -p $HF_HUB_CACHE
 # 📦 Modèle Mixtral GPTQ depuis TheBloke
 MODEL_REPO="TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ"
 MODEL_DIR=/workspace/models/mixtral
+AUTO_GPTQ_DIR=/workspace/auto-gptq
 
 echo "🚀 Mise à jour du système"
 apt update && apt install -y \
@@ -34,10 +35,15 @@ pip install numpy==1.24.4 --no-cache-dir
 pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # ⚙️ Compilation CUDA : auto-gptq complet
-git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git /workspace/auto-gptq
-cd /workspace/auto-gptq
+if [ ! -d "$AUTO_GPTQ_DIR" ]; then
+echo "✅ COMPILATION AUTO GPTQ"
+git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git $AUTO_GPTQ_DIR
+cd $AUTO_GPTQ_DIR
 pip install . --no-cache-dir
 cd -
+else
+ echo "✅ AUTO GPTQ DEJA PRESENT SUR LE SYSTEME"
+fi
 
 # 📦 Paquets PyPI classiques
 pip install \
