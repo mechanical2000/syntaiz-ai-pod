@@ -5,7 +5,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Installer Python 3.10 et les outils de base
 RUN apt update && apt install -y \
     software-properties-common \
-    python3.10-dev \
     build-essential \
     cmake \
     ninja-build \
@@ -18,6 +17,7 @@ RUN apt update && apt install -y \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt update && apt install -y \
     python3.10 \
+    python3.10-dev \
     python3.10-venv \
     python3.10-distutils
 
