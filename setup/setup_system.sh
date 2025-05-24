@@ -34,7 +34,7 @@ pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no
 
 # Installer le reste depuis PyPI standard
 pip install \
-    auto-gptq==0.4.2 \
+    git+https://github.com/PanQiWei/AutoGPTQ.git@v0.4.2 \
     transformers==4.33.2 \
     fastapi \
     uvicorn \
