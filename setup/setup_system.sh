@@ -29,7 +29,7 @@ mkdir -p $TMPDIR
 # 🔄 Installation des dépendances principales
 pip uninstall -y torch numpy auto-gptq triton || true
 pip install numpy==1.24.4 --no-cache-dir
-pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # ⚙️ Compilation CUDA : auto-gptq complet
 git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git /workspace/auto-gptq
@@ -47,12 +47,11 @@ pip install \
     huggingface_hub \
     --no-cache-dir
 
-# 📦 Paquets CUDA/PyTorch (depuis index cu118)
-pip install \
-    accelerate \
-    bitsandbytes \
-    --index-url https://download.pytorch.org/whl/cu118 \
-    --no-cache-dir
+# 📦 bitsandbytes compatible avec torch 2.1.0
+pip install bitsandbytes --prefer-binary --no-cache-dir
+
+# 📦 accelerate depuis index PyTorch
+pip install accelerate --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # 📁 Téléchargement conditionnel du modèle Mixtral GPTQ
 if [ ! -d "$MODEL_DIR" ]; then
