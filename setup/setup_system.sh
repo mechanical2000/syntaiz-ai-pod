@@ -2,7 +2,8 @@
 
 set -e
 
-export HUGGINGFACE_HUB_TOKEN=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
+# 🔐 Authentification Hugging Face pour modèles gated
+export HUGGINGFACE_HUB_TOKEN=hf_XXXXXXXXXXXXXXXXXXXXXXXX
 
 echo "🚀 Mise à jour du système"
 apt update && apt install -y \
@@ -29,7 +30,7 @@ MODEL_DIR=/workspace/models/mixtral
 if [ ! -d "$MODEL_DIR" ]; then
     echo "📥 Téléchargement du modèle Mixtral dans $MODEL_DIR..."
     mkdir -p $MODEL_DIR
-    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='mistralai/Mixtral-8x7B-Instruct-v0.1', local_dir='$MODEL_DIR', local_dir_use_symlinks=False)"
+    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='mistralai/Mixtral-8x7B-Instruct-v0.1', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, use_auth_token=True)"
 else
     echo "✅ Modèle Mixtral déjà présent dans $MODEL_DIR"
 fi
@@ -48,8 +49,8 @@ echo "✅ Déploiement terminé !"
 echo ""
 echo "🌐 Tu peux tester ton API via TCP avec clé API avec :"
 echo ""
-echo "curl -X POST http://$IP_PUBLIQUE:5001/generate \\"
-echo "     -H \"x-api-key: syntaiz-super-secret-key\" \\"
-echo "     -H \"Content-Type: application/json\" \\"
-echo "     -d '{\"prompt\": \"Explique le mot synonyme\"}'"
+echo "curl -X POST http://$IP_PUBLIQUE:5001/generate \
+     -H \"x-api-key: syntaiz-super-secret-key\" \
+     -H \"Content-Type: application/json\" \
+     -d '{\"prompt\": \"Explique le mot synonyme\"}'"
 echo ""
