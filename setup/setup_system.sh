@@ -60,7 +60,7 @@ pip install \
 if [ ! -d "$MODEL_DIR" ]; then
     echo "📥 Téléchargement du modèle Mixtral quantifié depuis $MODEL_REPO dans $MODEL_DIR..."
     mkdir -p $MODEL_DIR
-     python3 -c "import os; from huggingface_hub import snapshot_download; snapshot_download(repo_id='mistralai/Mixtral-8x7B-Instruct-v0.1', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token=os.getenv('HUGGINGFACE_HUB_TOKEN'))"
+    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token=os.getenv('HUGGINGFACE_HUB_TOKEN'))"
 else
     echo "✅ Modèle Mixtral déjà présent dans $MODEL_DIR"
 fi
