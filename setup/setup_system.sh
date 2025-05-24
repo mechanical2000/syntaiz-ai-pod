@@ -2,9 +2,6 @@
 
 set -e
 
-# 🔐 Authentification Hugging Face pour modèles gated
-export HUGGINGFACE_HUB_TOKEN=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
-
 # 📁 Répertoire cache HF local pour éviter les erreurs de quota
 export HF_HUB_CACHE=/workspace/tmp/hf-cache
 mkdir -p $HF_HUB_CACHE
@@ -19,6 +16,7 @@ apt update && apt install -y \
     cmake \
     ninja-build \
     python3-pip \
+    python3.10-dev \
     git \
     curl \
     nano \
@@ -39,16 +37,20 @@ cd /workspace/auto-gptq
 pip install . --no-cache-dir
 cd -
 
-# 📦 Autres dépendances via PyTorch index
+# 📦 Paquets PyPI classiques
 pip install \
-    transformers==4.33.2 \
+    transformers \
     fastapi \
     uvicorn \
-    accelerate \
-    bitsandbytes \
     sentencepiece \
     safetensors \
     huggingface_hub \
+    --no-cache-dir
+
+# 📦 Paquets CUDA/PyTorch (depuis index cu118)
+pip install \
+    accelerate \
+    bitsandbytes \
     --index-url https://download.pytorch.org/whl/cu118 \
     --no-cache-dir
 
@@ -99,8 +101,8 @@ echo "✅ Déploiement terminé !"
 echo ""
 echo "🌐 Tu peux tester ton API via le proxy Nginx :"
 echo ""
-echo "curl -X POST http://$IP_PUBLIQUE/generate \
-     -H \"x-api-key: syntaiz-super-secret-key\" \
-     -H \"Content-Type: application/json\" \
-     -d '{\"prompt\": \"Explique le mot synonyme\"}'"
+echo "curl -X POST http://$IP_PUBLIQUE/generate \\"
+echo "     -H \"x-api-key: syntaiz-super-secret-key\" \\"
+echo "     -H \"Content-Type: application/json\" \\"
+echo "     -d '{\"prompt\": \"Explique le mot synonyme\"}'"
 echo ""
