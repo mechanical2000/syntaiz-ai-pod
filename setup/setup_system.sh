@@ -34,6 +34,7 @@ pip uninstall -y torch numpy auto-gptq || true
 pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118
 pip install numpy==1.24.4
 pip install auto-gptq==0.4.2
+pip install transformers==4.33.2
 
 pip install --no-cache-dir --cache-dir=$PIP_CACHE_DIR \
     -r /workspace/syntaiz-ai-pod/setup/requirements.txt
