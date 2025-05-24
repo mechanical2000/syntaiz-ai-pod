@@ -3,7 +3,7 @@
 set -e
 
 # 🔐 Authentification Hugging Face pour modèles gated
-export HUGGINGFACE_HUB_TOKEN=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
+export HUGGINGFACE_HUB_TOKEN=hf_XXXXXXXXXXXXXXXXXXXXXXXX
 
 # 📁 Répertoire cache HF local pour éviter les erreurs de quota
 export HF_HUB_CACHE=/workspace/tmp/hf-cache
@@ -42,6 +42,26 @@ else
     echo "✅ Modèle Mixtral déjà présent dans $MODEL_DIR"
 fi
 
+# 🔄 Configuration de Nginx pour reverse proxy vers Uvicorn
+NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
+cp "$NGINX_DEFAULT_CONF" "${NGINX_DEFAULT_CONF}.backup"
+
+cat > "$NGINX_DEFAULT_CONF" <<EOF
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location / {
+        proxy_pass http://127.0.0.1:5001;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+EOF
+
+echo "🔄 Redémarrage de Nginx"
+nginx -t && (nginx -s stop 2>/dev/null || true) && nginx
+
 echo "🚀 Lancement de l'app FastAPI (Uvicorn) en arrière-plan"
 cd /workspace/syntaiz-ai-pod/app
 nohup uvicorn main:app --host 0.0.0.0 --port 5001 > /workspace/app.log 2>&1 &
@@ -54,9 +74,9 @@ IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
 echo "✅ Déploiement terminé !"
 echo ""
-echo "🌐 Tu peux tester ton API via TCP avec clé API avec :"
+echo "🌐 Tu peux tester ton API via le proxy Nginx :"
 echo ""
-echo "curl -X POST http://$IP_PUBLIQUE:5001/generate \
+echo "curl -X POST http://$IP_PUBLIQUE/generate \
      -H \"x-api-key: syntaiz-super-secret-key\" \
      -H \"Content-Type: application/json\" \
      -d '{\"prompt\": \"Explique le mot synonyme\"}'"
