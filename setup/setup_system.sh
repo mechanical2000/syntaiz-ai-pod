@@ -33,7 +33,7 @@ pip install numpy==1.24.4 --no-cache-dir
 pip install torch==2.0.1 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # Installer le reste depuis PyPI standard
-pip install https://huggingface.co/TheBloke/auto-gptq/resolve/main/auto_gptq-0.4.2+cu118-cp310-cp310-linux_x86_64.whl --no-cache-dir
+pip install "https://$HUGGINGFACE_HUB_TOKEN@huggingface.co/TheBloke/auto-gptq/resolve/main/auto_gptq-0.4.2+cu118-cp310-cp310-linux_x86_64.whl" --no-cache-dir
 
 # Installer le reste via PyTorch index (hors auto-gptq)
 pip install \
