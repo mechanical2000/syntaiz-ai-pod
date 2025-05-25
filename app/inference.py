@@ -5,7 +5,7 @@ import os
 MODEL_DIR = "/workspace/models/mixtral"
 
 print("🔄 Chargement du tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=False)
 
 print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
 model = AutoModelForCausalLM.from_pretrained(
