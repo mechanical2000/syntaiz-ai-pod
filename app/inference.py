@@ -1,22 +1,20 @@
-from transformers import AutoTokenizer, TextStreamer
-from auto_gptq import AutoGPTQForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
 import torch
 import os
 
 MODEL_DIR = "/workspace/models/mixtral"
 
 # 🔄 Chargement du tokenizer
-print("🔄 Chargement du tokenizer Mixtral GPTQ...")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True, trust_remote_code=True)
+print("🔄 Chargement du tokenizer Mixtral...")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True)
 
-# 🔄 Chargement du modèle GPTQ quantifié
-print("🔄 Chargement du modèle Mixtral GPTQ...")
-model = AutoGPTQForCausalLM.from_quantized(
+# 🔄 Chargement du modèle en 8-bit via bitsandbytes
+print("🔄 Chargement du modèle Mixtral (8-bit avec bitsandbytes)...")
+model = AutoModelForCausalLM.from_pretrained(
     MODEL_DIR,
-    use_safetensors=True,
-    trust_remote_code=True,
-    device="cuda",
-    model_type="llama"  # 👈 f
+    device_map="auto",
+    torch_dtype=torch.float16,
+    load_in_8bit=True
 )
 
 streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
