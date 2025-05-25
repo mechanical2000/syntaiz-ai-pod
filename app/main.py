@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
-import inference
+from inference import generate_response
 
 app = FastAPI()
 
@@ -17,4 +17,4 @@ async def verify_api_key(request: Request, call_next):
 
 @app.post("/generate")
 def generate_text(input: PromptInput):
-    return {"response": inference.generate_response(input.prompt)}
+    return {"response": generate_response(input.prompt)}
