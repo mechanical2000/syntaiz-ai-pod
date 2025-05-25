@@ -2,70 +2,64 @@
 
 set -e
 
-# 🔐 Authentification Hugging Face
+# 🔐 Token Hugging Face (nécessaire si le modèle est gated)
 export HUGGINGFACE_HUB_TOKEN=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
 
-# 📁 Répertoire cache local Hugging Face + TMPDIR
-export HF_HUB_CACHE=/workspace/hf-cache
-export TMPDIR=/workspace/tmp
-mkdir -p $HF_HUB_CACHE $TMPDIR
+# 📁 Répertoire de cache Hugging Face
+export HF_HUB_CACHE=/workspace/tmp/hf-cache
+mkdir -p $HF_HUB_CACHE
 
-# 📦 Dossier du modèle
+# 📦 Modèle Mixtral officiel (non quantifié)
 MODEL_REPO="mistralai/Mixtral-8x7B-Instruct-v0.1"
-MODEL_DIR=/workspace/models/mixtral
+MODEL_DIR="/workspace/models/mixtral"
 
-echo "🚀 Mise à jour du système"
+# 🧱 Mise à jour système et dépendances
 apt update && apt install -y \
     build-essential \
     cmake \
-    ninja-build \
     python3-pip \
     python3.10-dev \
     git \
     curl \
     nano \
-    nginx
+    nginx \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libgoogle-perftools-dev
 
-# 🔄 Installation de base
-pip uninstall -y torch numpy triton || true
-pip install numpy==1.24.4 --no-cache-dir
+# 🔁 Dossier temporaire
+export TMPDIR=/workspace/tmp
+mkdir -p $TMPDIR
+
+# 🔄 Nettoyage d’éventuelles anciennes installations
+pip uninstall -y torch numpy triton bitsandbytes || true
+
+# 🧠 Torch + CUDA 11.8
 pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
-pip install protobuf --no-cache-dir
 
-# 📦 Paquets classiques
+# 📦 Paquets principaux
 pip install \
+    numpy==1.24.4 \
     transformers \
-    fastapi \
-    uvicorn \
+    bitsandbytes \
+    accelerate \
     sentencepiece \
     safetensors \
     huggingface_hub \
-    accelerate \
-    bitsandbytes \
+    fastapi \
+    uvicorn \
+    protobuf \
     --no-cache-dir
 
-# 🧹 Nettoyage éventuel de cache obsolète
-rm -rf /root/.cache/huggingface || true
-rm -rf $MODEL_DIR/* || true
-
-# 📥 Téléchargement conditionnel du modèle Mixtral
-if [ ! -d "$MODEL_DIR" ] || [ -z "$(ls -A $MODEL_DIR)" ]; then
-    echo "📥 Téléchargement du modèle Mixtral dans $MODEL_DIR..."
-    mkdir -p $MODEL_DIR
-    python3 -c "
-from huggingface_hub import snapshot_download
-snapshot_download(
-    repo_id='$MODEL_REPO',
-    local_dir='$MODEL_DIR',
-    local_dir_use_symlinks=False,
-    token='$HUGGINGFACE_HUB_TOKEN',
-    cache_dir='$HF_HUB_CACHE'
-)"
+# 📥 Téléchargement conditionnel du modèle
+if [ ! -d "$MODEL_DIR" ]; then
+    echo "📥 Téléchargement du modèle Mixtral depuis $MODEL_REPO"
+    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token='$HUGGINGFACE_HUB_TOKEN')"
 else
     echo "✅ Modèle déjà présent dans $MODEL_DIR"
 fi
 
-# 🔧 Nginx reverse proxy
+# 🌐 Nginx (reverse proxy)
 NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
 cp "$NGINX_DEFAULT_CONF" "${NGINX_DEFAULT_CONF}.backup"
 
@@ -85,24 +79,18 @@ EOF
 echo "🔄 Redémarrage de Nginx"
 nginx -t && (nginx -s stop 2>/dev/null || true) && nginx
 
-echo "🚀 Lancement de FastAPI (Uvicorn) en arrière-plan"
+# 🚀 Lancement de l’API
 cd /workspace/syntaiz-ai-pod/app
 nohup uvicorn main:app --host 0.0.0.0 --port 5001 > /workspace/app.log 2>&1 &
 
-# 🧹 Nettoyage temporaire
-echo "🧹 Nettoyage des fichiers temporaires"
-rm -rf $TMPDIR
-
-# 🧪 Validation GPU
-echo "🔍 Test GPU"
-python3 -c "import torch; print('CUDA:', torch.cuda.is_available(), '| Device:', torch.cuda.get_device_name(0))"
+# 🧪 GPU
+echo "🔍 Test CUDA"
+python3 -c "import torch; print('CUDA:', torch.cuda.is_available(), '| GPU:', torch.cuda.get_device_name(0))"
 
 IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
 echo "✅ Déploiement terminé !"
-echo ""
-echo "🌐 Tu peux tester ton API via :"
-echo ""
+echo "🌐 API dispo via Nginx :"
 echo "curl -X POST http://$IP_PUBLIQUE/generate \\"
 echo "     -H \"x-api-key: syntaiz-super-secret-key\" \\"
 echo "     -H \"Content-Type: application/json\" \\"
