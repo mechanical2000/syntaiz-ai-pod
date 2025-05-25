@@ -51,11 +51,11 @@ cd -
 
 # 🛠️ 1. Patch _utils.py → pour que config.model_type = "llama" si mixtral
 UTILS_PATH=$(python3 -c "import auto_gptq, os; print(os.path.join(os.path.dirname(auto_gptq.__file__), 'modeling', '_utils.py'))")
-sed -i 's/config.model_type/config.model_type if config.model_type != "mixtral" else "llama"/' "$UTILS_PATH"
+sed -i "s/raise TypeError(f.{config.model_type} isn't supported yet.)/model_type = config.model_type if config.model_type != 'mixtral' else 'llama'\\n    raise TypeError(f'{model_type} isn\\'t supported yet.')/" "$UTILS_PATH"
 
 # 🛠️ 2. Patch _base.py → pour empêcher l’erreur de type
 BASE_PATH=$(python3 -c "import auto_gptq, os; print(os.path.join(os.path.dirname(auto_gptq.__file__), 'modeling', '_base.py'))")
-sed -i 's/raise TypeError(f"{config.model_type} isn.t supported yet.")/# Patch désactivé pour Mixtral/' "$BASE_PATH"
+sed -i "s/config.model_type/config.model_type if config.model_type != 'mixtral' else 'llama'/g" "$BASE_PATH"
 
 # ✅ Vérification d'import auto_gptq
 python3 -c "from auto_gptq import AutoGPTQForCausalLM" || {
