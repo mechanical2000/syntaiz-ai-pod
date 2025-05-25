@@ -19,7 +19,7 @@ model = AutoModelForCausalLM.from_pretrained(
 
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-def generate_text(prompt: str, max_new_tokens: int = 256) -> str:
+def generate_response(prompt: str, max_new_tokens: int = 256) -> str:
     print(f"⚙️ Génération pour : {prompt}")
     outputs = pipe(prompt, max_new_tokens=max_new_tokens, do_sample=True, temperature=0.7)
     return outputs[0]["generated_text"]

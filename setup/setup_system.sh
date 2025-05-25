@@ -54,7 +54,7 @@ pip install \
 # 📥 Téléchargement conditionnel du modèle
 if [ ! -d "$MODEL_DIR" ]; then
     echo "📥 Téléchargement du modèle Mixtral depuis $MODEL_REPO"
-    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token='$HUGGINGFACE_HUB_TOKEN')"
+    python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', token='$HUGGINGFACE_HUB_TOKEN')"
 else
     echo "✅ Modèle déjà présent dans $MODEL_DIR"
 fi
