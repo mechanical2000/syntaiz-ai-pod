@@ -30,6 +30,7 @@ apt update && apt install -y \
 pip uninstall -y torch numpy triton || true
 pip install numpy==1.24.4 --no-cache-dir
 pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+pip install protobuf --no-cache-dir
 
 # 📦 Paquets classiques
 pip install \
