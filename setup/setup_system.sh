@@ -38,15 +38,17 @@ pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no
 if [ ! -d "$AUTO_GPTQ_DIR" ]; then
 echo "✅ COMPILATION AUTO GPTQ"
 git clone --branch v0.4.2 https://github.com/PanQiWei/AutoGPTQ.git $AUTO_GPTQ_DIR
-cd $AUTO_GPTQ_DIR
-pip install . --no-cache-dir
-cd -
-# 📛 Patch auto_gptq pour Mixtral
-UTILS_PATH=$(python3 -c "import auto_gptq, os; print(os.path.join(os.path.dirname(auto_gptq.__file__), 'modeling', '_utils.py'))")
-sed -i 's/config.model_type/config.model_type if config.model_type != "mixtral" else "mistral"/' "$UTILS_PATH"
 else
  echo "✅ AUTO GPTQ DEJA PRESENT SUR LE SYSTEME"
 fi
+
+cd $AUTO_GPTQ_DIR
+pip install . --no-cache-dir
+cd -
+
+# 📛 Patch auto_gptq pour Mixtral
+UTILS_PATH=$(python3 -c "import auto_gptq, os; print(os.path.join(os.path.dirname(auto_gptq.__file__), 'modeling', '_utils.py'))")
+sed -i "s/config.model_type/config.model_type if config.model_type != 'mixtral' else 'mistral'/" "$UTILS_PATH"
 
 # ✅ Vérification d'import auto_gptq
 python3 -c "from auto_gptq import AutoGPTQForCausalLM" || {
