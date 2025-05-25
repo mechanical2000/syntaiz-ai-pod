@@ -49,13 +49,24 @@ cd -
 
 # 📛 Patch auto_gptq pour Mixtral
 
-# 🛠️ 1. Patch _utils.py → pour que config.model_type = "llama" si mixtral
+# 🛠️ Patch 1 — _utils.py : accepte mixtral comme mistral
 UTILS_PATH=$(python3 -c "import auto_gptq, os; print(os.path.join(os.path.dirname(auto_gptq.__file__), 'modeling', '_utils.py'))")
-sed -i "s/raise TypeError(f.{config.model_type} isn't supported yet.)/model_type = config.model_type if config.model_type != 'mixtral' else 'llama'\\n    raise TypeError(f'{model_type} isn\\'t supported yet.')/" "$UTILS_PATH"
+if grep -q 'config.model_type' "$UTILS_PATH"; then
+    sed -i "s/\(raise TypeError(f\"{\)config.model_type\(} isn't supported yet.\")\)/\1config.model_type if config.model_type != 'mixtral' else 'llama'\2/" "$UTILS_PATH"
+    echo "✅ Patch _utils.py appliqué"
+else
+    echo "⚠️ Patch _utils.py non appliqué : motif introuvable"
+fi
 
-# 🛠️ 2. Patch _base.py → pour empêcher l’erreur de type
+# 🛠️ Patch 2 — _base.py : redirige mixtral → llama
 BASE_PATH=$(python3 -c "import auto_gptq, os; print(os.path.join(os.path.dirname(auto_gptq.__file__), 'modeling', '_base.py'))")
-sed -i "s/config.model_type/config.model_type if config.model_type != 'mixtral' else 'llama'/g" "$BASE_PATH"
+if grep -q 'config.model_type' "$BASE_PATH"; then
+    sed -i "s/config.model_type/config.model_type if config.model_type != 'mixtral' else 'llama'/g" "$BASE_PATH"
+    echo "✅ Patch _base.py appliqué"
+else
+    echo "⚠️ Patch _base.py non appliqué : motif introuvable"
+fi
+
 
 # ✅ Vérification d'import auto_gptq
 python3 -c "from auto_gptq import AutoGPTQForCausalLM" || {
