@@ -45,6 +45,12 @@ else
  echo "✅ AUTO GPTQ DEJA PRESENT SUR LE SYSTEME"
 fi
 
+# ✅ Vérification d'import auto_gptq
+python3 -c "from auto_gptq import AutoGPTQForCausalLM" || {
+    echo '❌ Échec d’import auto_gptq. Abandon.'
+    exit 1
+}
+
 # 📦 Paquets PyPI classiques
 pip install \
     transformers \
