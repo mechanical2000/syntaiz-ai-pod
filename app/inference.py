@@ -13,11 +13,10 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True, trust_remote
 print("🔄 Chargement du modèle Mixtral GPTQ...")
 model = AutoGPTQForCausalLM.from_quantized(
     MODEL_DIR,
-    model_basename="gptq_model-4bit-128g",  
     use_safetensors=True,
     trust_remote_code=True,
     device="cuda",
-    model_type="llama"
+    model_type="llama"  # 👈 f
 )
 
 streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)

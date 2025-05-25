@@ -46,10 +46,6 @@ cd $AUTO_GPTQ_DIR
 pip install . --no-cache-dir
 cd -
 
-# 📛 Patch auto_gptq pour Mixtral
-UTILS_PATH=$(python3 -c "import auto_gptq, os; print(os.path.join(os.path.dirname(auto_gptq.__file__), 'modeling', '_utils.py'))")
-sed -i "s/config.model_type/config.model_type if config.model_type != 'mixtral' else 'mistral'/" "$UTILS_PATH"
-
 # ✅ Vérification d'import auto_gptq
 python3 -c "from auto_gptq import AutoGPTQForCausalLM" || {
     echo '❌ Échec d’import auto_gptq. Abandon.'
