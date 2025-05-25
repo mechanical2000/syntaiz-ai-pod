@@ -62,11 +62,10 @@ pip install \
     --no-cache-dir
 
 # 📦 Paquets CUDA/PyTorch (depuis index cu118)
-pip install \
-    accelerate \
-    bitsandbytes \
-    --index-url https://download.pytorch.org/whl/cu118 \
-    --no-cache-dir
+pip install accelerate --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+
+# 📦 bitsandbytes depuis PyPI
+pip install bitsandbytes --no-cache-dir
 
 # 📁 Téléchargement conditionnel du modèle Mixtral GPTQ
 if [ ! -d "$MODEL_DIR" ]; then
