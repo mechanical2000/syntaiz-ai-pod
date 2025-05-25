@@ -13,8 +13,9 @@ print("🔄 Chargement du modèle Mixtral (8-bit avec bitsandbytes)...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_DIR,
     device_map="auto",
+    load_in_8bit=True,
     torch_dtype=torch.float16,
-    load_in_8bit=True
+    llm_int8_enable_fp32_cpu_offload=True
 )
 
 streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
