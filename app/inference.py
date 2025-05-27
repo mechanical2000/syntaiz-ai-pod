@@ -1,28 +1,39 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline,  BitsAndBytesConfig
 import torch
-import os
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
-bnb_config = BitsAndBytesConfig(
+MODEL_DIR = "/workspace/models/mixtral"
+
+# Configuration 8bit avec offload CPU
+quant_config = BitsAndBytesConfig(
     load_in_8bit=True,
     llm_int8_enable_fp32_cpu_offload=True
 )
 
-MODEL_DIR = "/workspace/models/mixtral"
-
 print("🔄 Chargement du tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True)
+print("✅ Tokenizer chargé.")
 
-print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
+print("🔄 Chargement du modèle Mixtral (8bit + offload CPU)...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_DIR,
     device_map="auto",
-    quantization_config=bnb_config,
+    quantization_config=quant_config,
+    trust_remote_code=True,
     torch_dtype=torch.float16
 )
+print("✅ Modèle chargé.")
 
-pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
-
-def generate_response(prompt: str, max_new_tokens: int = 256) -> str:
-    print(f"⚙️ Génération pour : {prompt}")
-    outputs = pipe(prompt, max_new_tokens=max_new_tokens, do_sample=True, temperature=0.7)
-    return outputs[0]["generated_text"]
+def generate_response(prompt: str) -> str:
+    print(f"📨 Prompt reçu : {prompt}")
+    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    with torch.no_grad():
+        output = model.generate(
+            **inputs,
+            max_new_tokens=512,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.95
+        )
+    decoded = tokenizer.decode(output[0], skip_special_tokens=True)
+    print(f"✅ Réponse générée : {decoded}")
+    return decoded
