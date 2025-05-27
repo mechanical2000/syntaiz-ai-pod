@@ -4,11 +4,7 @@ import os
 
 bnb_config = BitsAndBytesConfig(
     load_in_8bit=True,
-    llm_int8_threshold=6.0,
-    llm_int8_has_fp16_weight=True,
-    bnb_4bit_compute_dtype=torch.float16,
-    bnb_4bit_use_double_quant=True,
-    bnb_4bit_quant_type="nf4"
+    llm_int8_enable_fp32_cpu_offload=True
 )
 
 MODEL_DIR = "/workspace/models/mixtral"
@@ -20,8 +16,8 @@ print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_DIR,
     device_map="auto",
-    torch_dtype=torch.float16,
-    quantization_config=bnb_config
+    quantization_config=bnb_config,
+    torch_dtype=torch.float16
 )
 
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
