@@ -1,39 +1,34 @@
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
 MODEL_DIR = "/workspace/models/mixtral"
 
-# Configuration 8bit avec offload CPU
-quant_config = BitsAndBytesConfig(
-    load_in_8bit=True,
-    llm_int8_enable_fp32_cpu_offload=True
-)
-
 print("🔄 Chargement du tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True)
-print("✅ Tokenizer chargé.")
 
-print("🔄 Chargement du modèle Mixtral (8bit + offload CPU)...")
+print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_DIR,
     device_map="auto",
-    quantization_config=quant_config,
-    trust_remote_code=True,
-    torch_dtype=torch.float16
+    torch_dtype=torch.float16,
+    load_in_8bit=True
 )
-print("✅ Modèle chargé.")
+
+generation_config = GenerationConfig(
+    max_new_tokens=256,
+    temperature=0.7,
+    top_p=0.95,
+    top_k=40,
+    repetition_penalty=1.2,
+    do_sample=True,
+    eos_token_id=tokenizer.eos_token_id,
+)
 
 def generate_response(prompt: str) -> str:
-    print(f"📨 Prompt reçu : {prompt}")
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
-        output = model.generate(
+        outputs = model.generate(
             **inputs,
-            max_new_tokens=512,
-            do_sample=True,
-            temperature=0.7,
-            top_p=0.95
+            generation_config=generation_config
         )
-    decoded = tokenizer.decode(output[0], skip_special_tokens=True)
-    print(f"✅ Réponse générée : {decoded}")
-    return decoded
+    return tokenizer.decode(outputs[0], skip_special_tokens=True)
