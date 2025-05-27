@@ -1,4 +1,4 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, BitsAndBytesConfig
 import torch
 
 MODEL_DIR = "/workspace/models/mixtral"
@@ -6,12 +6,18 @@ MODEL_DIR = "/workspace/models/mixtral"
 print("🔄 Chargement du tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True)
 
+bnb_config = BitsAndBytesConfig(
+    load_in_8bit=True,
+    llm_int8_enable_fp32_cpu_offload=True
+)
+
 print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_DIR,
+    quantization_config=bnb_config,
     device_map="auto",
-    torch_dtype=torch.float16,
-    load_in_8bit=True
+    trust_remote_code=True,
+    torch_dtype=torch.float16
 )
 
 generation_config = GenerationConfig(
