@@ -1,40 +1,35 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM, TextGenerationPipeline
 import torch
 
-MODEL_DIR = "/workspace/models/mixtral"
+# Nom du modèle quantifié 4-bit
+model_name = "TheBloke/Mixtral-8x7B-v0.1-GPTQ"
+revision = "gptq-4bit-128g-actorder_True"
 
+# Chargement du tokenizer
 print("🔄 Chargement du tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True)
+tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
 
-bnb_config = BitsAndBytesConfig(
-    load_in_8bit=True,
-    llm_int8_enable_fp32_cpu_offload=True
-)
-
-print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
+# Chargement du modèle quantifié
+print("🚀 Chargement du modèle quantifié avec AutoGPTQ (4-bit)...")
 model = AutoModelForCausalLM.from_pretrained(
-    MODEL_DIR,
-    quantization_config=bnb_config,
+    model_name,
     device_map="auto",
     trust_remote_code=True,
-    torch_dtype=torch.float16
+    revision=revision
 )
 
-generation_config = GenerationConfig(
-    max_new_tokens=256,
-    temperature=0.7,
-    top_p=0.95,
-    top_k=40,
-    repetition_penalty=1.2,
-    do_sample=True,
-    eos_token_id=tokenizer.eos_token_id,
-)
+# Pipeline de génération
+pipe = TextGenerationPipeline(model=model, tokenizer=tokenizer, device=0)
 
 def generate_response(prompt: str) -> str:
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            generation_config=generation_config
-        )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+    outputs = pipe(
+        prompt,
+        max_new_tokens=256,
+        do_sample=True,
+        temperature=0.7,
+        top_p=0.95,
+        repetition_penalty=1.1,
+        num_return_sequences=1,
+        eos_token_id=tokenizer.eos_token_id
+    )
+    return outputs[0]['generated_text']
