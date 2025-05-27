@@ -30,7 +30,8 @@ mkdir -p $TMPDIR
 
 # 🔄 Installation des libs principales
 pip install -U pip setuptools wheel --no-cache-dir
-pip install numpy==1.24.4 torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+pip install "numpy>=1.24,<1.27" --no-cache-dir
+pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
 # 📦 Paquets principaux
 pip install \
