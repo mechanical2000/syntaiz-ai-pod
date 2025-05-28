@@ -37,13 +37,8 @@ git clone https://github.com/TimDettmers/bitsandbytes.git
 cd bitsandbytes
 
 # Force la variable d’environnement CUDA
-export CUDA_VERSION=118
-
-# Supprimer les builds précédents au cas où
-rm -rf build/ dist/ bitsandbytes.egg-info/
-
-# Compilation manuelle
-CUDA_VERSION=118 python3 setup.py install
+make cuda11x
+python3 setup.py install
 
 cd -
 
