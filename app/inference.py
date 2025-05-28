@@ -39,15 +39,20 @@ _ = model.generate(
     max_new_tokens=1
 )
 
-def generate_response(prompt: str) -> str:
+def generate_response(
+    prompt: str,
+    max_new_tokens: int = 128,
+    do_sample: bool = False,
+    temperature: float = 0.7
+) -> str:
     inputs = tokenizer(prompt, return_tensors="pt")
     inputs = {k: v.to(model.device) for k, v in inputs.items()}
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=128,
-            do_sample=False,
-            temperature=0.7
+            max_new_tokens=max_new_tokens,
+            do_sample=do_sample,
+            temperature=temperature
         )
     output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
