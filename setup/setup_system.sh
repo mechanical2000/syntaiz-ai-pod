@@ -24,7 +24,7 @@ apt update && apt install -y \
 # 🔧 Python et pip
 pip install --upgrade pip
 pip install wheel setuptools
-pip install --prefer-binary --no-cache-dir \
+pip install --no-cache-dir \
     numpy \
     torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
     transformers \
@@ -34,9 +34,10 @@ pip install --prefer-binary --no-cache-dir \
     huggingface_hub \
     fastapi \
     uvicorn \
+    bitsandbytes \
     protobuf
 
-pip install bitsandbytes
+
 
 # 📥 Téléchargement conditionnel du modèle
 if [ ! -d "$MODEL_DIR" ]; then
