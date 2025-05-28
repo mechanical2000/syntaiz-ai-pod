@@ -1,4 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from accelerate import init_empty_weights, load_checkpoint_and_dispatch
 import torch
 
 torch.backends.cuda.matmul.allow_tf32 = True
@@ -16,12 +17,26 @@ print("🔄 Chargement du tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, use_fast=True)
 
 print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
-model = AutoModelForCausalLM.from_pretrained(
+with init_empty_weights():
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_PATH,
+        quantization_config=bnb_config,
+        torch_dtype=torch.float16,
+        trust_remote_code=True
+    )
+
+# Dispatch dynamique vers CPU/GPU selon capacité mémoire
+model = load_checkpoint_and_dispatch(
+    model,
     MODEL_PATH,
-    device_map="auto",
-    quantization_config=bnb_config,
-    torch_dtype=torch.float16,
-    trust_remote_code=True
+    device_map="auto"
+)
+
+# 🔥 Warm-up : première génération très légère
+print("⚡ Préchauffage du modèle...")
+_ = model.generate(
+    **tokenizer("Bonjour", return_tensors="pt").to(model.device),
+    max_new_tokens=1
 )
 
 def generate_response(prompt: str) -> str:
@@ -34,4 +49,9 @@ def generate_response(prompt: str) -> str:
             do_sample=False,
             temperature=0.7
         )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+    output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    if output_text.strip().startswith(prompt.strip()):
+        output_text = output_text[len(prompt):]
+
+    return output_text.strip()
