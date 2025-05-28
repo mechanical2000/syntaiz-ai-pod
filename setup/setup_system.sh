@@ -1,46 +1,54 @@
 #!/bin/bash
+
 set -e
 
-export HUGGINGFACE_HUB_TOKEN=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
+export HUGGINGFACE_HUB_TOKEN=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  # Remplace par ton token perso
 
-# 📁 Cache HuggingFace local
+# 📁 Répertoires
 export HF_HUB_CACHE=/workspace/tmp/hf-cache
-mkdir -p $HF_HUB_CACHE
-
-# 📁 Modèle local
 MODEL_REPO="mistralai/Mixtral-8x7B-Instruct-v0.1"
-MODEL_DIR="/workspace/models/mixtral"
+MODEL_DIR=/workspace/models/mixtral
+TMPDIR=/workspace/tmp
 
-# 📦 Installation minimale
-pip install \
-    numpy==1.26.3 \
+# 📦 Mise à jour système
+apt update && apt install -y \
+    build-essential \
+    cmake \
+    python3-pip \
+    python3.10-dev \
+    git \
+    curl \
+    nano \
+    nginx
+
+# 🔧 Python et pip
+pip install --upgrade pip
+pip install wheel setuptools
+pip install --prefer-binary --no-cache-dir \
+    numpy \
+    torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
+    bitsandbytes \
     transformers \
     accelerate \
     sentencepiece \
     safetensors \
+    huggingface_hub \
     fastapi \
     uvicorn \
-    huggingface_hub \
-    protobuf \
-    --no-cache-dir
+    protobuf
 
-# 📥 Téléchargement du modèle Mixtral si manquant
+# 📥 Téléchargement conditionnel du modèle
 if [ ! -d "$MODEL_DIR" ]; then
-    echo "📥 Téléchargement du modèle quantifié Mixtral (4bit)..."
-    mkdir -p $MODEL_DIR
+    echo "📥 Téléchargement du modèle ${MODEL_REPO}..."
     python3 -c "
 from huggingface_hub import snapshot_download
-snapshot_download(
-    repo_id='$MODEL_REPO',
-    local_dir='$MODEL_DIR',
-    token='$HUGGINGFACE_HUB_TOKEN',
-    local_dir_use_symlinks=False
-)"
+snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token='$HUGGINGFACE_HUB_TOKEN')
+"
 else
     echo "✅ Modèle déjà présent dans $MODEL_DIR"
 fi
 
-# 🔧 NGINX proxy
+# 🔄 Configuration Nginx
 NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
 cp "$NGINX_DEFAULT_CONF" "${NGINX_DEFAULT_CONF}.backup"
 
@@ -57,15 +65,10 @@ server {
 }
 EOF
 
-echo "🔄 Redémarrage de NGINX"
 nginx -t && (nginx -s stop 2>/dev/null || true) && nginx
 
-# 🚀 Lancement FastAPI
+# 🚀 Lancement API
 cd /workspace/syntaiz-ai-pod/app
 nohup uvicorn main:app --host 0.0.0.0 --port 5001 > /workspace/app.log 2>&1 &
 
-# ✅ Vérif CUDA
-echo "🔍 Test GPU"
-python3 -c "import torch; print('CUDA:', torch.cuda.is_available(), '| Device:', torch.cuda.get_device_name(0))"
-
-rm -rf /workspace/tmp
+echo "✅ Lancement terminé"
