@@ -26,7 +26,7 @@ apt update && apt install -y \
 pip install --upgrade pip
 pip install wheel setuptools
 pip install --prefer-binary --no-cache-dir \
-    numpy \
+    numpy==1.26.3 \
     torch==2.2.0 --extra-index-url https://download.pytorch.org/whl/cu118 \
     bitsandbytes --prefer-binary \
     transformers \
