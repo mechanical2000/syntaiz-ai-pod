@@ -1,52 +1,64 @@
 #!/bin/bash
 
 set -e
+
 export HUGGINGFACE_HUB_TOKEN=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
-export HF_HUB_CACHE=/workspace/tmp/hf-cache
-export TMPDIR=/workspace/tmp
-mkdir -p $HF_HUB_CACHE $TMPDIR
 
-echo "🚀 Mise à jour du système..."
+# 📁 Chemin vers le modèle et cache
+MODEL_REPO="mistralai/Mixtral-8x7B-Instruct-v0.1"
+MODEL_DIR="/workspace/models/mixtral"
+export HF_HUB_CACHE="/workspace/tmp/hf-cache"
+mkdir -p "$HF_HUB_CACHE" "$MODEL_DIR"
+
+# 🔧 Préparation système
 apt update && apt install -y \
-    build-essential cmake ninja-build \
-    python3-pip python3.10-dev \
-    git curl nano nginx
+    build-essential \
+    cmake \
+    ninja-build \
+    python3-pip \
+    python3.10-dev \
+    git \
+    curl \
+    nano \
+    nginx
 
-echo "🚧 Nettoyage des installations précédentes..."
+# 🔄 Nettoyage et installation de torch & deps
 pip uninstall -y torch numpy bitsandbytes || true
-
-echo "📦 Installation de Torch avec CUDA 11.8..."
-pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 pip install numpy==1.24.1 --no-cache-dir
+pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
-echo "📦 Installation des dépendances Python..."
+# 🧩 Installation de transformers & autres
 pip install \
     transformers \
     accelerate \
+    fastapi \
+    uvicorn \
     sentencepiece \
     safetensors \
     huggingface_hub \
-    fastapi uvicorn \
+    protobuf \
     --no-cache-dir
 
-echo "🛠️ Compilation de bitsandbytes avec support CUDA 11.8..."
-
+# ⚙️ Compilation de bitsandbytes manuellement
 cd /workspace
 rm -rf bitsandbytes
-git clone https://github.com/TimDettmers/bitsandbytes.git
+git clone https://github.com/bitsandbytes-foundation/bitsandbytes.git
 cd bitsandbytes
-
-# Force la variable d’environnement CUDA
 make cuda11x
 python3 setup.py install
+cd ..
 
-cd -
+# 📥 Téléchargement du modèle HuggingFace
+python3 -c "
+from huggingface_hub import snapshot_download
+snapshot_download(repo_id='$MODEL_REPO', local_dir='$MODEL_DIR', local_dir_use_symlinks=False, token='$HUGGINGFACE_HUB_TOKEN')
+"
 
-echo "🔧 Configuration de Nginx pour reverse proxy..."
-NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
-cp "$NGINX_DEFAULT_CONF" "${NGINX_DEFAULT_CONF}.backup"
+# 🔧 Nginx config pour proxy local
+NGINX_CONF="/etc/nginx/sites-available/default"
+cp "$NGINX_CONF" "$NGINX_CONF.backup"
 
-cat > "$NGINX_DEFAULT_CONF" <<EOF
+cat > "$NGINX_CONF" <<EOF
 server {
     listen 80 default_server;
     server_name _;
@@ -59,19 +71,8 @@ server {
 }
 EOF
 
-echo "🔁 Redémarrage de Nginx"
 nginx -t && (nginx -s stop 2>/dev/null || true) && nginx
 
-echo "🚀 Lancement de l'API FastAPI"
+# 🚀 Lancement serveur FastAPI
 cd /workspace/syntaiz-ai-pod/app
 nohup uvicorn main:app --host 0.0.0.0 --port 5001 > /workspace/app.log 2>&1 &
-
-echo "🧪 Validation GPU"
-python3 -c "import torch; print('CUDA:', torch.cuda.is_available(), '| Device:', torch.cuda.get_device_name(0))"
-
-IP_PUBLIQUE=$(curl -s ifconfig.me)
-echo ""
-echo "✅ Déploiement terminé !"
-echo "🌐 Exemple de requête :"
-echo "curl -X POST http://$IP_PUBLIQUE/generate -H 'x-api-key: syntaiz-super-secret-key' -H 'Content-Type: application/json' -d '{\"prompt\": \"Explique le mot synonyme\"}'"
-echo ""

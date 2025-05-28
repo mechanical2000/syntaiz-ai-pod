@@ -1,22 +1,32 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import torch
 
-# 🔄 Chemin vers le modèle local
+# 📁 Modèle local
 MODEL_PATH = "/workspace/models/mixtral"
 
+# ⚙️ Config quantification 4-bit avec bitsandbytes
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype=torch.float16
+)
+
+# 🔄 Chargement du tokenizer
 print("🔄 Chargement du tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, use_fast=True)
 
+# 🚀 Chargement du modèle quantifié avec bitsandbytes
 print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
     device_map="auto",
+    quantization_config=bnb_config,
     torch_dtype=torch.float16,
-    load_in_4bit=True,
     trust_remote_code=True
 )
 
-# 🔁 Fonction de génération
+# 🧠 Fonction de génération de texte
 def generate_response(prompt: str) -> str:
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
