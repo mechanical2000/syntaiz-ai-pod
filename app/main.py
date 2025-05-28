@@ -1,27 +1,43 @@
+import os
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import torch
+from huggingface_hub import snapshot_download
 
-# 🔄 Identifiant Hugging Face du modèle (repo public)
-MODEL_ID = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+# 📁 Répertoire du modèle local
+MODEL_DIR = "/workspace/models/mixtral"
+MODEL_REPO = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+HF_TOKEN = os.environ.get("HUGGINGFACE_HUB_TOKEN")
 
-# ⚙️ Configuration quantification 4-bit
+# 📥 Téléchargement conditionnel du modèle
+if not os.path.isdir(MODEL_DIR):
+    print(f"📦 Téléchargement du modèle depuis {MODEL_REPO} dans {MODEL_DIR}...")
+    snapshot_download(
+        repo_id=MODEL_REPO,
+        local_dir=MODEL_DIR,
+        local_dir_use_symlinks=False,
+        token=HF_TOKEN
+    )
+
+# 🔄 Chargement du tokenizer
+print("🔄 Chargement du tokenizer...")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, use_fast=True, token=HF_TOKEN)
+
+# ⚙️ Quantization config pour bitsandbytes 4bit
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_use_double_quant=True,
     bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.float16
+    bnb_4bit_compute_dtype=torch.float16,
 )
 
-print("🔄 Chargement du tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, use_fast=True, token=__import__("os").environ.get("HUGGINGFACE_HUB_TOKEN"))
-
-print("🚀 Chargement du modèle quantifié avec bitsandbytes...")
+# 🚀 Chargement du modèle
+print("🚀 Chargement du modèle quantifié en 4bit avec bitsandbytes...")
 model = AutoModelForCausalLM.from_pretrained(
-    MODEL_ID,
-    quantization_config=bnb_config,
+    MODEL_DIR,
     device_map="auto",
+    quantization_config=bnb_config,
     trust_remote_code=True,
-    token=__import__("os").environ.get("HUGGINGFACE_HUB_TOKEN")
+    token=HF_TOKEN
 )
 
 # 🔁 Fonction de génération

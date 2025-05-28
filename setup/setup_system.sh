@@ -37,17 +37,6 @@ pip install \
     protobuf \
     --no-cache-dir
 
-# 📥 Téléchargement du modèle dans $MODEL_DIR
-echo "📥 Téléchargement du modèle $MODEL_ID dans $MODEL_DIR..."
-python3 -c "
-from huggingface_hub import snapshot_download
-snapshot_download(
-    repo_id='$MODEL_ID',
-    local_dir='$MODEL_DIR',
-    local_dir_use_symlinks=False,
-    token='$HUGGINGFACE_HUB_TOKEN'
-)
-"
 
 # 🔄 Configuration de Nginx pour reverse proxy vers Uvicorn
 NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
