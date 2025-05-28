@@ -34,10 +34,10 @@ cd /workspace
 rm -rf bitsandbytes
 git clone https://github.com/TimDettmers/bitsandbytes.git
 cd bitsandbytes
-export CUDA_VERSION=118
-export BNB_CUDA_VERSION=118
-make cuda11x
-python3 setup.py install
+
+# Compile manuellement les sources pour CUDA 11.8
+python3 setup.py install --cuda-version=118
+
 cd -
 
 echo "🔧 Configuration de Nginx pour reverse proxy..."
