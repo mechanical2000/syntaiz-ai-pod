@@ -30,11 +30,10 @@ pip uninstall -y torch numpy bitsandbytes || true
 pip install numpy==1.26.3 --no-cache-dir
 pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
-# 🔧 Compilation de bitsandbytes pour CUDA 11.8
 echo "🔧 Compilation de bitsandbytes depuis la source pour CUDA 11.8"
 cd /workspace
 rm -rf bitsandbytes
-git clone https://github.com/bitsandbytes-cuda/bitsandbytes.git
+git clone https://github.com/TimDettmers/bitsandbytes.git
 cd bitsandbytes
 export BNB_CUDA_VERSION=118
 python3 setup.py install
