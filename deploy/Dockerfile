@@ -1,6 +1,7 @@
 FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV BNB_CUDA_VERSION=118 
 
 # Installer Python 3.10 et les outils de base
 RUN apt update && apt install -y \
@@ -26,8 +27,17 @@ RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
     ln -sf /usr/bin/python3.10 /usr/bin/python3 && \
     wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && rm get-pip.py
 
-# Définir le répertoire de travail (volume RunPod)
+# Installer torch et ses dépendances avant bitsandbytes
+RUN pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
+    numpy==1.26.3
+
+# Cloner et compiler bitsandbytes manuellement
+RUN git clone --depth=1 https://github.com/TimDettmers/bitsandbytes.git /workspace/bitsandbytes && \
+    cd /workspace/bitsandbytes && \
+    python setup.py install
+
+# Répertoire de travail
 WORKDIR /workspace
 
-# Laisser l'utilisateur cloner le projet et lancer setup
+# Laisser l'utilisateur lancer setup_config.sh
 CMD ["sleep", "infinity"]
