@@ -32,14 +32,13 @@ pip uninstall -y bitsandbytes
 # 📁 Cloner le repo officiel dans un répertoire temporaire
 cd /workspace
 rm -rf bitsandbytes
-git clone https://github.com/bitsandbytes-cuda/bitsandbytes.git
+curl -L -o bnb.tar.gz https://github.com/bitsandbytes-cuda/bitsandbytes/archive/refs/heads/main.tar.gz
+tar -xzf bnb.tar.gz
+mv bitsandbytes-main bitsandbytes
 cd bitsandbytes
 
-# 📌 Compilation avec support CUDA 11.x (ex: 11.8)
 export CUDA_VERSION=118
 make cuda11x
-
-# 🧱 Installation locale
 pip install .
 
 # 🔙 Retour au dossier principal
