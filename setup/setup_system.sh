@@ -32,9 +32,7 @@ pip uninstall -y bitsandbytes
 # 📁 Cloner le repo officiel dans un répertoire temporaire
 cd /workspace
 rm -rf bitsandbytes
-curl -L -o bnb.tar.gz https://github.com/bitsandbytes-cuda/bitsandbytes/archive/refs/heads/main.tar.gz
-tar -xzf bnb.tar.gz
-mv bitsandbytes-main bitsandbytes
+git clone https://ghproxy.com/https://github.com/bitsandbytes-cuda/bitsandbytes.git
 cd bitsandbytes
 
 export CUDA_VERSION=118
