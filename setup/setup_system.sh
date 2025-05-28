@@ -17,7 +17,7 @@ pip uninstall -y torch numpy bitsandbytes || true
 
 echo "📦 Installation de Torch avec CUDA 11.8..."
 pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
-pip install numpy --no-cache-dir
+pip install numpy==1.24.1 --no-cache-dir
 
 echo "📦 Installation des dépendances Python..."
 pip install \
