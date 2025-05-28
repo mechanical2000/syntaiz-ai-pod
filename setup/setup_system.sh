@@ -21,14 +21,14 @@ apt update && apt install -y \
     nano \
     nginx
 
+pip torch==2.2.0 --extra-index-url https://download.pytorch.org/whl/cu118 
 
 # 🔧 Python et pip
 pip install --upgrade pip
 pip install wheel setuptools
 pip install --prefer-binary --no-cache-dir \
     numpy==1.26.3 \
-    torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
-    bitsandbytes\
+    bitsandbytes --prefer-binary \
     transformers \
     accelerate \
     sentencepiece \
