@@ -2,7 +2,7 @@
 set -e
 
 # 🔐 Jeton Hugging Face
-export HUGGINGFACE_HUB_TOKEN=hf_hf_oWokkszjNWtbGFZEJEgdupPWzZAudbhNml  # ← Remplace ici
+export HUGGINGFACE_HUB_TOKEN=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  # ← Remplace ici
 
 # 📁 Dossiers & modèle
 MODEL_REPO="TheBloke/Mixtral-8x7B-Instruct-v0.1-GPTQ"
