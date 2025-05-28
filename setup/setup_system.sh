@@ -29,8 +29,8 @@ pip install --prefer-binary --no-cache-dir \
     numpy==1.26.3 \
     torch==2.1.2 --extra-index-url https://download.pytorch.org/whl/cu118 \
     bitsandbytes --prefer-binary \
-    transformers==4.39.3 \
-    tokenizers==0.19.1 \
+    transformers==4.38.2 \
+    tokenizers==0.18.1 \
     accelerate==0.28.0\
     sentencepiece \
     safetensors \
