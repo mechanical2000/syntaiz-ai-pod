@@ -26,7 +26,7 @@ pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no
 echo "📦 Installation des dépendances Python"
 pip install \
     numpy \
-    transformers \
+    transformers==4.40.2 \
     accelerate \
     bitsandbytes \
     sentencepiece \
