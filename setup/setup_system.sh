@@ -21,7 +21,7 @@ apt update && apt install -y \
     nano \
     nginx
 
-pip torch==2.2.0 --extra-index-url https://download.pytorch.org/whl/cu118 
+pip install torch==2.2.0 --extra-index-url https://download.pytorch.org/whl/cu118 
 
 # 🔧 Python et pip
 pip install --upgrade pip
