@@ -27,7 +27,6 @@ pip install wheel setuptools
 pip install --prefer-binary --no-cache-dir \
     numpy \
     torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
-    bitsandbytes \
     transformers \
     accelerate \
     sentencepiece \
@@ -36,6 +35,8 @@ pip install --prefer-binary --no-cache-dir \
     fastapi \
     uvicorn \
     protobuf
+
+pip install bitsandbytes
 
 # 📥 Téléchargement conditionnel du modèle
 if [ ! -d "$MODEL_DIR" ]; then
