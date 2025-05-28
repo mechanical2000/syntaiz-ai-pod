@@ -27,9 +27,9 @@ pip install --upgrade pip
 pip install wheel setuptools
 pip install --prefer-binary --no-cache-dir \
     numpy==1.26.3 \
-    torch==2.2.0 --extra-index-url https://download.pytorch.org/whl/cu118 \
+    torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
     bitsandbytes\
-    transformers==4.37.2 \
+    transformers \
     accelerate \
     sentencepiece \
     safetensors \
