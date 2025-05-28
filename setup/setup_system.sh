@@ -1,44 +1,59 @@
 #!/bin/bash
+
 set -e
 
-# 🔐 Auth Hugging Face (nécessaire si modèle est gated)
 export HUGGINGFACE_HUB_TOKEN=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
 
-# 📁 Variables
-MODEL_ID="mistralai/Mixtral-8x7B-Instruct-v0.1"
-MODEL_DIR="/workspace/models/mixtral"
+# 📁 Cache HF local
+export HF_HUB_CACHE=/workspace/tmp/hf-cache
+mkdir -p $HF_HUB_CACHE
 
-# 📦 Màj système
+# 📁 Répertoires
+MODEL_DIR=/workspace/models/mixtral
+TMPDIR=/workspace/tmp
+mkdir -p $TMPDIR
+
+echo "🚀 Mise à jour du système"
 apt update && apt install -y \
     build-essential \
     cmake \
     ninja-build \
+    python3-pip \
+    python3.10-dev \
     git \
     curl \
     nano \
-    python3-pip \
-    python3.10-dev \
-    nginx \
-    libprotobuf-dev protobuf-compiler
+    nginx
 
-# 📦 Pip + numpy (fallback version)
-pip install --upgrade pip
-pip install numpy --no-cache-dir
-
-# 📦 Librairies IA
+# 🔄 Torch + numpy
+pip uninstall -y torch numpy bitsandbytes || true
+pip install numpy==1.26.3 --no-cache-dir
 pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
+
+# 🔧 Compilation de bitsandbytes pour CUDA 11.8
+echo "🔧 Compilation de bitsandbytes depuis la source pour CUDA 11.8"
+cd /workspace
+rm -rf bitsandbytes
+git clone https://github.com/bitsandbytes-cuda/bitsandbytes.git
+cd bitsandbytes
+export BNB_CUDA_VERSION=118
+python3 setup.py install
+cd -
+
+# 📦 Paquets Python nécessaires
 pip install \
     transformers \
-    accelerate \
-    bitsandbytes \
+    fastapi \
+    uvicorn \
     sentencepiece \
     safetensors \
     huggingface_hub \
+    accelerate \
     protobuf \
+    optimum \
     --no-cache-dir
 
-
-# 🔄 Configuration de Nginx pour reverse proxy vers Uvicorn
+# 🔄 Configuration NGINX
 NGINX_DEFAULT_CONF="/etc/nginx/sites-available/default"
 cp "$NGINX_DEFAULT_CONF" "${NGINX_DEFAULT_CONF}.backup"
 
@@ -55,18 +70,24 @@ server {
 }
 EOF
 
-echo "🔄 Redémarrage de Nginx"
+echo "🔁 Redémarrage NGINX"
 nginx -t && (nginx -s stop 2>/dev/null || true) && nginx
 
-# 🚀 Démarrage de l'app FastAPI
-echo "🚀 Lancement de FastAPI via Uvicorn"
+echo "🚀 Lancement de l'app FastAPI"
 cd /workspace/syntaiz-ai-pod/app
 nohup uvicorn main:app --host 0.0.0.0 --port 5001 > /workspace/app.log 2>&1 &
 
-# ✅ Affichage d'infos finales
+# Nettoyage
+rm -rf $TMPDIR
+
+# 🧪 Test GPU
+python3 -c "import torch; print('CUDA:', torch.cuda.is_available(), '| Device:', torch.cuda.get_device_name(0))"
+
 IP_PUBLIQUE=$(curl -s ifconfig.me)
 echo ""
-echo "✅ Déploiement terminé. Tu peux tester avec :"
+echo "✅ Déploiement terminé !"
+echo ""
+echo "🌐 Teste l’API via NGINX avec la commande suivante :"
 echo ""
 echo "curl -X POST http://$IP_PUBLIQUE/generate \\"
 echo "     -H \"x-api-key: syntaiz-super-secret-key\" \\"
