@@ -27,7 +27,7 @@ pip install wheel setuptools
 pip install --prefer-binary --no-cache-dir \
     numpy \
     torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
-    bitsandbytes \
+    bitsandbytes==0.46.0 \
     transformers \
     accelerate \
     sentencepiece \
