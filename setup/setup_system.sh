@@ -21,14 +21,14 @@ apt update && apt install -y \
     nano \
     nginx
 
+pip install https://download.pytorch.org/whl/cu118/torch-2.2.0%2Bcu118-cp310-cp310-linux_x86_64.whl
 
 # 🔧 Python et pip
 pip install --upgrade pip
 pip install wheel setuptools
 pip install --prefer-binary --no-cache-dir \
     numpy==1.26.3 \
-    torch==2.2.0 --extra-index-url https://download.pytorch.org/whl/cu118 \
-    bitsandbytes --prefer-binary \
+    bitsandbytes \
     transformers \
     accelerate \
     sentencepiece \
