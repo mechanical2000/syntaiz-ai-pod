@@ -21,20 +21,14 @@ apt update && apt install -y \
     nano \
     nginx
 
-git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init --path)"
-pyenv install 3.10.13
-pyenv global 3.10.13
 
 # 🔧 Python et pip
 pip install --upgrade pip
 pip install wheel setuptools
 pip install --prefer-binary --no-cache-dir \
     numpy \
-    torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 \
-    bitsandbytes \
+    torch==2.2.0 --extra-index-url https://download.pytorch.org/whl/cu118 \
+    bitsandbytes --prefer-binary \
     transformers \
     accelerate \
     sentencepiece \
