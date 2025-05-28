@@ -27,6 +27,24 @@ pip uninstall -y torch numpy bitsandbytes || true
 pip install numpy==1.24.1 --no-cache-dir
 pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cu118 --no-cache-dir
 
+pip uninstall -y bitsandbytes
+
+# 📁 Cloner le repo officiel dans un répertoire temporaire
+cd /workspace
+rm -rf bitsandbytes
+git clone https://github.com/bitsandbytes-cuda/bitsandbytes.git
+cd bitsandbytes
+
+# 📌 Compilation avec support CUDA 11.x (ex: 11.8)
+export CUDA_VERSION=118
+make cuda11x
+
+# 🧱 Installation locale
+pip install .
+
+# 🔙 Retour au dossier principal
+cd /workspace
+
 # 🧩 Installation de transformers & autres
 pip install \
     transformers \
@@ -38,15 +56,6 @@ pip install \
     huggingface_hub \
     protobuf \
     --no-cache-dir
-
-# ⚙️ Compilation de bitsandbytes manuellement
-cd /workspace
-rm -rf bitsandbytes
-git clone https://github.com/bitsandbytes-foundation/bitsandbytes.git
-cd bitsandbytes
-make cuda11x
-python3 setup.py install
-cd ..
 
 # 📥 Téléchargement du modèle HuggingFace
 python3 -c "
