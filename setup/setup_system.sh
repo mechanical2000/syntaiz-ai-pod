@@ -29,14 +29,21 @@ pip install \
     fastapi uvicorn \
     --no-cache-dir
 
-echo "🛠️ Compilation de bitsandbytes (CUDA 11.8)..."
+echo "🛠️ Compilation de bitsandbytes avec support CUDA 11.8..."
+
 cd /workspace
 rm -rf bitsandbytes
 git clone https://github.com/TimDettmers/bitsandbytes.git
 cd bitsandbytes
 
-# Compile manuellement les sources pour CUDA 11.8
-python3 setup.py install --cuda-version=118
+# Force la variable d’environnement CUDA
+export CUDA_VERSION=118
+
+# Supprimer les builds précédents au cas où
+rm -rf build/ dist/ bitsandbytes.egg-info/
+
+# Compilation manuelle
+CUDA_VERSION=118 python3 setup.py install
 
 cd -
 
