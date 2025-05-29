@@ -29,7 +29,7 @@ with init_empty_weights():
 model = load_checkpoint_and_dispatch(
     model,
     MODEL_PATH,
-    device_map="auto"
+    device_map={"": "cuda:0"}
 )
 
 # 🔥 Warm-up : première génération très légère
