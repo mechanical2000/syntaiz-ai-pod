@@ -3,7 +3,7 @@ import time
 import argparse
 
 # Configuration
-API_URL = "http://<TON_IP_RUNPOD>:8000/generate"  # ← remplace avec ton URL réelle
+API_URL = "https://3ee1xdbdw5fzvp-80.proxy.runpod.net/generate"  # ← remplace avec ton URL réelle
 
 # Interface CLI
 parser = argparse.ArgumentParser(description="Tester un prompt Mixtral distant")
@@ -21,9 +21,14 @@ def test_prompt(prompt):
         "do_sample": args.do_sample
     }
 
+    headers = {
+        "Content-Type": "application/json",
+        "x-api-key": "syntaiz-super-secret-key"  # Remplace "v1" par la vraie valeur si besoin
+    }
+
     try:
         start = time.time()
-        response = requests.post(API_URL, json=payload)
+        response = requests.post(API_URL, json=payload,  headers=headers)
         duration = time.time() - start
 
         response.raise_for_status()

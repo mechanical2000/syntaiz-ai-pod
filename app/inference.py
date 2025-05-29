@@ -44,7 +44,8 @@ def generate_response(
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=do_sample,
-            temperature=temperature
+            temperature=temperature,
+            eos_token_id=tokenizer.eos_token_id 
         )
     output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
